@@ -3,6 +3,9 @@ const Car = require('./cars-model')
 
 const {
     checkCarId,
+    checkCarPayload,
+    checkVinNumberUnique,
+    checkVinNumberValid
 } = require('./cars-middleware');
 
 const router = express.Router();
@@ -20,8 +23,18 @@ router.get('/:id', checkCarId, async (req, res, next) => {
     res.json(req.car)
 })
 
-router.post('/', async (req, res, next) => {
-    res.json('')
+router.post(
+    '/', 
+    checkCarPayload,
+    checkVinNumberUnique,
+    checkVinNumberValid,
+    async (req, res, next) => {
+        try {
+            const car = await Car.create(req.body)
+            res.json(car)
+        } catch (err) {
+            next(err)
+        }
 })
 
 module.exports = router;
